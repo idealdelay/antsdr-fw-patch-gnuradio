@@ -134,7 +134,7 @@ index 00000000..28c5739f
 +esac
 diff --git a/board/e200/S23udc b/board/e200/S23udc
 new file mode 100644
-index 00000000..202347f0
+index 00000000..4c6c3f9a
 --- /dev/null
 +++ b/board/e200/S23udc
 @@ -0,0 +1,175 @@
@@ -144,7 +144,7 @@ index 00000000..202347f0
 +
 +CONFIGFS=/sys/kernel/config/usb_gadget
 +GADGET=$CONFIGFS/composite_gadget
-+IIOD_OPTS="-D -n $ENDPOINTS -F /dev/iio_ffs"
++IIOD_OPTS="-D -n ip:$ENDPOINTS -F /dev/iio_ffs"
 +UDC_HANDLE_SUSPEND=`fw_printenv -n udc_handle_suspend 2> /dev/null || echo 0`
 +USB_ETH_MODE=`fw_printenv -n usb_ethernet_mode 2> /dev/null || echo rndis`
 +
@@ -5286,10 +5286,10 @@ index 00000000..2c5b0608
 +exit 0
 diff --git a/configs/zynq_e200_defconfig b/configs/zynq_e200_defconfig
 new file mode 100644
-index 00000000..8da87c95
+index 00000000..d66ec3a1
 --- /dev/null
 +++ b/configs/zynq_e200_defconfig
-@@ -0,0 +1,84 @@
+@@ -0,0 +1,86 @@
 +# Architecture
 +BR2_arm=y
 +BR2_cortex_a9=y
@@ -5349,7 +5349,9 @@ index 00000000..8da87c95
 +BR2_PACKAGE_LIBGPIOD=y
 +BR2_PACKAGE_LIBIIO=y
 +BR2_PACKAGE_LIBIIO_IIOD=y
-+BR2_PACKAGE_LIBIIO_IIOD_USB=y
++BR2_PACKAGE_LIBIIO_IIOD_USBD=y
++BR2_PACKAGE_LIBIIO_TESTS=y
++BR2_PACKAGE_LIBIIO_BINDINGS_PYTHON=y
 +BR2_PACKAGE_LIBINI=y
 +BR2_PACKAGE_POLL_SYSFS=y
 +BR2_PACKAGE_AD936X_REF_CAL=y
