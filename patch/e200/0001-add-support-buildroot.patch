@@ -5286,10 +5286,10 @@ index 00000000..2c5b0608
 +exit 0
 diff --git a/configs/zynq_e200_defconfig b/configs/zynq_e200_defconfig
 new file mode 100644
-index 00000000..b6a66596
+index 00000000..8da87c95
 --- /dev/null
 +++ b/configs/zynq_e200_defconfig
-@@ -0,0 +1,99 @@
+@@ -0,0 +1,84 @@
 +# Architecture
 +BR2_arm=y
 +BR2_cortex_a9=y
@@ -5302,7 +5302,6 @@ index 00000000..b6a66596
 +BR2_TOOLCHAIN_BUILDROOT=y
 +BR2_TOOLCHAIN_BUILDROOT_GLIBC=y
 +BR2_TOOLCHAIN_BUILDROOT_CXX=y
-+BR2_TOOLCHAIN_BUILDROOT_FORTRAN=y
 +BR2_KERNEL_HEADERS_SAME_AS_KERNEL=y
 +
 +# System
@@ -5317,15 +5316,6 @@ index 00000000..b6a66596
 +BR2_PACKAGE_ZSTD=y
 +BR2_PACKAGE_MTD=y
 +
-+# Linux firmware (WiFi)
-+BR2_PACKAGE_LINUX_FIRMWARE=y
-+BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT61=y
-+BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT73=y
-+BR2_PACKAGE_LINUX_FIRMWARE_RALINK_RT2XX=y
-+BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX=y
-+BR2_PACKAGE_LINUX_FIRMWARE_RTL_87XX=y
-+BR2_PACKAGE_LINUX_FIRMWARE_RTL_88XX=y
-+
 +# System utilities
 +BR2_PACKAGE_INPUT_EVENT_DAEMON=y
 +BR2_PACKAGE_UBOOT_TOOLS=y
@@ -5335,11 +5325,10 @@ index 00000000..b6a66596
 +BR2_PACKAGE_PYTHON3=y
 +BR2_PACKAGE_PYTHON3_PYC_ONLY=y
 +BR2_PACKAGE_PYTHON_NUMPY=y
-+BR2_PACKAGE_PYTHON_SCIPY=y
 +BR2_PACKAGE_PYTHON_PYZMQ=y
 +BR2_PACKAGE_PYTHON_PYYAML=y
 +
-+# GNU Radio (core SDR modules, no UHD/osmosdr/qtgui)
++# GNU Radio (core SDR modules + Python bindings, no UHD/osmosdr/qtgui)
 +BR2_PACKAGE_GNURADIO=y
 +BR2_PACKAGE_GNURADIO_BLOCKS=y
 +BR2_PACKAGE_GNURADIO_ANALOG=y
@@ -5354,11 +5343,6 @@ index 00000000..b6a66596
 +BR2_PACKAGE_GNURADIO_ZEROMQ=y
 +BR2_PACKAGE_GNURADIO_PYTHON=y
 +BR2_PACKAGE_GNURADIO_UTILS=y
-+
-+# DSP libraries
-+BR2_PACKAGE_LIQUID_DSP=y
-+BR2_PACKAGE_FFTW=y
-+BR2_PACKAGE_FFTW_SINGLE=y
 +
 +# ADI / IIO hardware stack
 +BR2_PACKAGE_LIBAD9361_IIO=y
@@ -5377,13 +5361,14 @@ index 00000000..b6a66596
 +BR2_PACKAGE_AVAHI=y
 +BR2_PACKAGE_AVAHI_DAEMON=y
 +BR2_PACKAGE_DROPBEAR=y
-+BR2_PACKAGE_WPA_SUPPLICANT=y
-+BR2_PACKAGE_WPA_SUPPLICANT_AUTOSCAN=y
 +
-+# Filesystem
++# Filesystem (cpio for FIT image, ext4 for SD card rootfs)
 +BR2_TARGET_ROOTFS_CPIO=y
 +BR2_TARGET_ROOTFS_CPIO_GZIP=y
 +BR2_TARGET_ROOTFS_CPIO_UIMAGE=y
++BR2_TARGET_ROOTFS_EXT2=y
++BR2_TARGET_ROOTFS_EXT2_4=y
++BR2_TARGET_ROOTFS_EXT2_SIZE="256M"
 +
 +# Host tools
 +BR2_PACKAGE_HOST_DOSFSTOOLS=y
@@ -5859,3 +5844,17 @@ index 00000000..db7661f4
 +     conf_data.set(name + '_PCFILEDIR', dep.get_variable('pcfiledir'))
 +   endif
 + endforeach
+diff --git a/package/volk/volk.mk b/package/volk/volk.mk
+index 396f4e6e..db5c938a 100644
+--- a/package/volk/volk.mk
++++ b/package/volk/volk.mk
+@@ -20,7 +20,8 @@ VOLK_CONF_OPTS = \
+ 	-DENABLE_MODTOOL=OFF \
+ 	-DENABLE_TESTING=OFF \
+ 	-DENABLE_PROFILING=OFF \
+-	-DVOLK_PYTHON_DIR=lib/python$(PYTHON3_VERSION_MAJOR)/site-packages
++	-DVOLK_PYTHON_DIR=lib/python$(PYTHON3_VERSION_MAJOR)/site-packages \
++	-DCMAKE_ASM_FLAGS=-Wa,--noexecstack
+ 
+ # For third-party blocks, the volk library is mandatory at
+ # compile time.
